@@ -29,6 +29,10 @@ VCCは3.3Vです。
 - Switch Matrix tool  
 - Flash Magic  
 
+##ファームウェア(プログラム)の書き込み方法  
+UART2I2C/Release/にある**UART2I2C.bin**または**UART2I2C.hex**を  
+書き込みツール**Flash Magic**等を使って書き込みを行って下さい。
+
 ##UART-I2Cブリッジの使い方  
 ### インタフェース仕様  
 - シリアル通信(UART)条件  
