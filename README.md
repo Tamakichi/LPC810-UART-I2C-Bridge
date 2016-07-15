@@ -12,6 +12,8 @@
 ##ハードウェア  
 **回路図**  
 <img src="img/01.jpg">  
+VCCは3.3Vです。  
+
 **利用部品**  
 - マイコンARM Cortex-M0(Flash 3KB, SRAM 1KB) LPC810(LPC810M021FN8) 1個   
 - I2Cバス用プルアップ抵抗 2.2k～10kΩ 2本    
@@ -61,7 +63,30 @@
 
 - I2C RTCモジュール(DS1307+AT2432)    
 <img src="img/sample02.jpg" width="300">  
+ - DS1307 時刻設定  
+   時刻 2015/05/17 (日) 21:00 を設定  
+    @wd0@h000000210117051500  
+   <img src="img/sample02_1.jpg">  
+
+ - DS1307 時刻読み出し  
+    @o2@rd008@h00  
+   <img src="img/sample02_2.jpg">  
+   (3回の実行で秒が更新されている)  
+
+ - AT2432 EEPROMデータ書き込み  
+    @wA0@h0000@sHello,World.  
+   <img src="img/sample02_3.jpg">  
+
+ - AT2432 EEPROMデータ読み出し  
+    @o1@ra00c@h0000  
+   <img src="img/sample02_4.jpg">  
 
 - Wiiヌンチャク(黒ヌンチャク仕様)  
 <img src="img/sample03.jpg" width="300">  
+    @wA4@hF055  
+    @wA4@hFB00    
+    @gA406  
+<img src="img/sample03_1.jpg" width="300">  
+
+
 
