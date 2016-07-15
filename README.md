@@ -18,6 +18,7 @@ VCCは3.3Vです。
 - マイコンARM Cortex-M0(Flash 3KB, SRAM 1KB) LPC810(LPC810M021FN8) 1個   
 - I2Cバス用プルアップ抵抗 2.2k～10kΩ 2本    
 - タクトスイッチ 2個 リセット用x1、ISP用x1     
+- USB-UARTモジュール(3.3V)  1個 ※プログラム書き込みおよびPCからの利用時に必要 
 
 **ユーニバーサル基板実装例 表と裏**    
 <img src="img/04.jpg">  
@@ -30,8 +31,13 @@ VCCは3.3Vです。
 - Flash Magic  
 
 ##ファームウェア(プログラム)の書き込み方法  
-UART2I2C/Release/にある**UART2I2C.bin**または**UART2I2C.hex**を  
+UART2I2C/Release/にある**UART2I2C.bin**または**UART2I2C.hex**がプログラム本体です。    
 書き込みツール**Flash Magic**等を使って書き込みを行って下さい。
+
+書き込み方法は下記を参照して下さい。  
+LPCZone：NXP LPCマイコン情報 - LPC810のフラッシュへの書き込みをシリアルインターフェースで行なう  
+http://www.nxp-lpc.com/programming_note/note3.html  
+
 
 ##UART-I2Cブリッジの使い方  
 ### インタフェース仕様  
@@ -43,6 +49,7 @@ UART2I2C/Release/にある**UART2I2C.bin**または**UART2I2C.hex**を
 
 ### シリアル通信接続チェック  
 @v[改行] を入力してバージョン情報が正しく表示出来ることを確認します。  
+(ローカルエコーON、送信・受信の改行コードをCR+LFに設定)  
 <img src="img/05.jpg">  
 
 ### コマンド仕様  
