@@ -51,6 +51,9 @@ UART2I2C/Release/にある**UART2I2C.bin**または**UART2I2C.hex**を
 (リンクを直接開くと一部文字化けするようです。ダウンロードして参照下さい)  
 [ART-I2Cブリッジコマンド仕様書V100L2.pdf](/doc/UART-I2Cブリッジコマンド仕様書V100L2.pdf)  
 
+エラーコード一覧  
+<img src="img/error.gif">   
+
 ### 利用例  
 - 有機ＥＬキャラクタディスプレイモジュール(SO1602AWWB-UC-WB-U)  
 <img src="img/sample01.jpg" width="300">  
