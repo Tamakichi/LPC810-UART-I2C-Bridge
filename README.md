@@ -86,7 +86,7 @@ VCCは3.3Vです。
     @wA4@hF055  
     @wA4@hFB00    
     @gA406  
-<img src="img/sample03_1.jpg" width="300">  
+<img src="img/sample03_2.jpg" width="300">  
 
 
 
