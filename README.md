@@ -41,8 +41,20 @@
 [ART-I2Cブリッジコマンド仕様書V100L2.pdf](/doc/UART-I2Cブリッジコマンド仕様書V100L2.pdf)  
 
 ### 利用例  
+- 有機ＥＬキャラクタディスプレイモジュール(SO1602AWWB-UC-WB-U)  
 <img src="img/sample01.jpg" width="300">  
+送信コマンド  
+    @c7800@h01020c01  
+    @w78@h40@sThank you!  
+
+- 液晶キャラクタディスプレイモジュール(ACM1602N1-FLW-FBW)  
+<img src="img/sample04.jpg" width="300">  
+送信コマンド  
+    @cA000@h01380c  
+    @cA080@sHello!World!  
+    @cA000@hc0
+    @cA080@sThis is LPC810!  
+
 <img src="img/sample02.jpg" width="300">  
 <img src="img/sample03.jpg" width="300">  
-<img src="img/sample04.jpg" width="300">  
 
