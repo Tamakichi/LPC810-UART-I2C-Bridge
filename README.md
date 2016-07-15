@@ -66,7 +66,7 @@ UART2I2C/Release/にある**UART2I2C.bin**または**UART2I2C.hex**を
 送信コマンド  
     @cA000@h01380c  
     @cA080@sHello!World!  
-    @cA000@hc0
+    @cA000@hc0  
     @cA080@sThis is LPC810!  
 
 - I2C RTCモジュール(DS1307+AT2432)    
