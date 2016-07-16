@@ -53,7 +53,7 @@ http://www.nxp-lpc.com/programming_note/note3.html
 <img src="img/05.jpg">  
 
 ### コマンド仕様  
-<img src="img/command.GIF">  
+<img src="img/command.gif">  
 コマンドの詳細については下記を参照下さい。  
 (リンクを直接開くと一部文字化けするようです。ダウンロードして参照下さい)  
 [ART-I2Cブリッジコマンド仕様書V100L2.pdf](/doc/UART-I2Cブリッジコマンド仕様書V100L2.pdf)  
