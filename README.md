@@ -65,8 +65,8 @@ http://www.nxp-lpc.com/programming_note/note3.html
 - 有機ＥＬキャラクタディスプレイモジュール(SO1602AWWB-UC-WB-U)  
 <img src="img/sample01.jpg" width="300">  
 送信コマンド  
-    @c7800@h01020c01  
-    @w78@h40@sThank you!  
+    @c7800@h01020c0180
+    @c7840@sThank you! 
 
 - 液晶キャラクタディスプレイモジュール(ACM1602N1-FLW-FBW)  
 <img src="img/sample04.jpg" width="300">  
