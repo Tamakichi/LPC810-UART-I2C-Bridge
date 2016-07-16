@@ -26,7 +26,7 @@ VCCは3.3Vです。
 ##開発環境  
 本モジュール用プログラムの開発はWindows 10上にて行っています。  
 開発には次のソフトウェアを利用しています。  
-- LPC Xpresso v7.6.2  
+- LPC Xpresso v7.6.2  (+ライブラリ: CMSIS_CORE_LPC8xx)
 - Switch Matrix tool  
 - Flash Magic  
 
