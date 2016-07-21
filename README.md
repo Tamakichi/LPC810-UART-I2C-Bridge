@@ -55,8 +55,7 @@ http://www.nxp-lpc.com/programming_note/note3.html
 ### コマンド仕様  
 <img src="img/command.gif">  
 コマンドの詳細については下記を参照下さい。  
-(リンクを直接開くと一部文字化けするようです。ダウンロードして参照下さい)  
-[ART-I2Cブリッジコマンド仕様書V100L3.pdf](/doc/UART-I2Cブリッジコマンド仕様書V100L3.pdf)  
+[ART-I2Cブリッジコマンド仕様書V100L3.pdf](https://github.com/Tamakichi/LPC810-UART-I2C-Bridge/raw/master/doc/UART-I2C%E3%83%96%E3%83%AA%E3%83%83%E3%82%B8%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E4%BB%95%E6%A7%98%E6%9B%B8V100L3.pdf)  
 
 エラーコード一覧  
 <img src="img/error.gif">   
