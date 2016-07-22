@@ -1,9 +1,11 @@
 /*
  *  i2c.c
- *  LPC810 LPCXpresso I2C用関数
- *  Created on: 2015/04/06
+ *  LPC810 LPCXpresso I2C用関数 Author: たま吉さん
+ *  Created  on: 2015/04/06
  *  Modified on: 2015/04/18
- *      Author: たま吉さん
+ *  Modified on: 2016/07/17, i2c_setTimeOut()追加,i2c_waitReady()のタイムアウト時間を変更可能にする
+ *  Modified on: 2016/07/19, I2C プルアップ、オープンドレイン設定ミスの修正
+ *
  */
 
 #include "LPC8xx.h"
@@ -12,10 +14,17 @@
 #include "mrt.h"
 #include "lpc_types.h"
 
+static uint32_t _timeout = 500;
+
+// I2Cタイムアウト設定
+void i2c_setTimeOut(uint32_t t) {
+	_timeout = t;
+}
+
 // I2C送受信レディ待ち
 // 500msecでタイムアウト
 bool i2c_waitReady() {
-	uint32_t cnt = mrt_read_counter()+500;
+	uint32_t cnt = mrt_read_counter()+_timeout; // 2016/07/17 変更
 	while(!(LPC_I2C->STAT & STAT_MSTPEND)) {
 		if (mrt_read_counter() > cnt) {
 			return false;
@@ -226,13 +235,13 @@ int i2c_msendRcv(uint32_t addr, uint8_t *tx, uint32_t txlen, uint8_t *rx, uint32
 //
 void i2c_init() {
 #if LPC810
-	// オープンドレイン設定(LPC810のPIN2,PIN3をI2Cに設定)
-	LPC_IOCON->PIO0_2 |= (0x1<<10);
-	LPC_IOCON->PIO0_3 |= (0x1<<10);
+	// オープンドレイン、プルアップ設定(LPC810のPIN2,PIN3をI2Cに設定) 2016/07/19 修正
+	LPC_IOCON->PIO0_2 |= 0x410;
+	LPC_IOCON->PIO0_3 |= 0x410;
 #else
-	// オープンドレイン設定(LPC812MAX設定)
-	LPC_IOCON->PIO0_10 |= (0x1<<10);
-	LPC_IOCON->PIO0_11|= (0x1<<10);
+	// オープンドレイン、プルアップ設定(LPC812MAX設定)
+	LPC_IOCON->PIO0_10 |= 0x410;
+	LPC_IOCON->PIO0_11 |= 0x410;
 #endif
 	// クロック供給開始
 	LPC_SYSCON->SYSAHBCLKCTRL |= (1<<5);
@@ -247,4 +256,6 @@ void i2c_init() {
 	LPC_I2C->MSTTIME = TIM_MSTSCLLOW(0x00) | TIM_MSTSCLHIGH(0x00);
 	NVIC_DisableIRQ(I2C_IRQn);
 	LPC_I2C->CFG |= CFG_MSTENA;
+
+	i2c_setTimeOut(500);	// 2016/07/17 追加
 }

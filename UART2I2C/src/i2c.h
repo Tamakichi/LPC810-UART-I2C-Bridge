@@ -3,7 +3,8 @@
  *
  *  Created on: 2015/04/06
  *      Author: たま吉さん
- */
+ *  Modified on: 2016/07/17, i2c_setTimeOut(uint32_t t)の追加
+*/
 
 #ifndef I2C_H_
 #define I2C_H_
@@ -73,6 +74,7 @@ extern "C"
 #define I2C_ERR_DATASND		-4  // スレーブにデータ送信でNACKを受信
 #define I2C_ERR_DATARCV		-5  // データ受信失敗
 
+extern void i2c_setTimeOut(uint32_t t);
 extern bool i2c_waitReady();
 extern int i2c_msend(uint32_t addr, uint8_t *tx, uint32_t Length );
 extern int i2c_mreceive(uint32_t addr, uint8_t *rx, uint32_t Length );

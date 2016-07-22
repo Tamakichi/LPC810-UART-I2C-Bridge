@@ -3,6 +3,7 @@
  *
  *  Created on: 2015/04/06
  *      Author: tamakichi
+ *  Modifed on: 2016/07/18, uart_setNewLine() 改行コード設定 追加
  */
 
 #ifndef UART_H_
@@ -60,13 +61,14 @@ void uart_init(LPC_USART_TypeDef *UARTx, uint32_t Baudrate);
 void uart_write(const char c);
 int  uart_available(void);
 char uart_read(void);
-int  uart_readline(char *s , uint16_t len, uint32_t tmout);
+int  uart_readline(char *s , uint16_t len, uint32_t tmout, uint8_t echo);
 void uart_print(const char *s);
 void uart_writeln(void);
 void uart_println(const char *s);
 void uart_clear(void);
 void uart_print_dec(uint8_t d);
 void uart_print_hex(uint8_t d);
+void uart_setNewLine(uint8_t mode);
 #ifdef __cplusplus
 }
 #endif

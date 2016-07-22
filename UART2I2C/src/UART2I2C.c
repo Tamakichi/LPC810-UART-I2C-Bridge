@@ -2,7 +2,7 @@
 ===============================================================================
  Name        : UART2I2C.c
  Author      : Tamakichi
- Version     : 1.01
+ Version     : 2.00
  Copyright   : $(copyright)
  Description : main definition
 ===============================================================================
@@ -18,7 +18,7 @@
 #include "mrt.h"
 #include "i2c.h"
 
-#define MYVERSION			"[v1.01 2015/04/18 by Tamakichi]"
+#define MYVERSION			"[v2.00 2016/07/19 by Tamakichi]"
 #define CMD_ERR_BADCMD		-10 // コマンドエラー
 #define CMD_ERR_STRHEX		-11 // 16進数文字異常
 #define CMD_ERR_CMDPRM		-12 // パラメタエラー
@@ -26,11 +26,14 @@
 #define CMD_ERR_NOCMD		-14 // 補助コマンドのみ指定
 #define CMD_ERR_NODATA		-15 // コマンドのデータがない
 
+#define I2C_ADR_SHIFT		1	// 7ビットアドレスを8ビットに変換(0で無変換 = 8ビット指定）
+
 bool    flginf;		// I2C通信エラー通知フラグ
 uint8_t modeOut;	// 受信データ出力形式
 bool    flgdebug;	// デバッグ情報出力
 uint8_t cmdwait;	// コマンド実行時のウエイト
 bool    flgichigo;	// IchigoJam用REM(')文字を先頭付加フラグ
+uint8_t modeECHO;	// ローカルエコー
 
 void for_ichigo_rem() {
 	if (flgichigo) {
@@ -143,6 +146,61 @@ void debug_uartToi2c(int n, uint8_t* i2c_cmd,char *text) {
 }
 
 //
+// I2Cバスに接続しているスレーブのアドレス（7ビット）を表示する
+//
+void i2cdetect(uint8_t mode) {
+	uint8_t i;
+	uint8_t dummy;
+	int rc;
+
+	// タイムアウト時間を一時的に100msecに変更
+	i2c_setTimeOut(100);
+
+	// 上ヘッダーの出力
+	if (mode) {
+		for_ichigo_rem();
+		uart_print("   ");
+		for (i=0; i < 16 ; i++) {
+			uart_print_hex(i); uart_print(" ");
+		}
+		uart_writeln();
+	}
+
+	// スキャン結果の出力(スキャン範囲 0x08～0x77)
+	for (i=0; i<128; i++) {
+		if (!(i & 0x0f) && mode) {
+			// 左ヘッダ表示
+			for_ichigo_rem();
+			uart_print_hex(i & 0xf0 );
+			uart_print(" ");
+		}
+		if (i < 0x08 || i > 0x77 ) {
+			if (mode)
+				uart_print("  ");
+		} else {
+			rc = i2c_msend(i<<I2C_ADR_SHIFT, &dummy, 0);
+			if (!rc) {
+				uart_print_hex(i);
+			} else {
+				if (mode)
+					uart_print("--");
+			}
+		}
+		if (mode)
+			uart_print(" ");
+
+		if ( ((i & 0x0f) == 0x0f) && mode) {
+			uart_writeln(); // 1行改行
+		}
+	}
+	uart_writeln(); // 1行改行
+
+	// タイムアウト時間を一時的に500msecに戻す
+	i2c_setTimeOut(500);
+
+}
+
+//
 // I2Cコマンド発行
 //
 int execI2Ccmd(uint8_t* i2c_cmd, int len,uint8_t* rcv) {
@@ -151,16 +209,16 @@ int execI2Ccmd(uint8_t* i2c_cmd, int len,uint8_t* rcv) {
 	bool flgexec = false;
 	if (i2c_cmd[0] == 'w') {
 		// 一括送信コマンドの実行
-		rc = i2c_msend(i2c_cmd[1], &i2c_cmd[2], len-2);
+		rc = i2c_msend(i2c_cmd[1]<<I2C_ADR_SHIFT, &i2c_cmd[2], len-2);
 		flgexec = true;
 	} else if (i2c_cmd[0] == 'r') {
 		// 送受信コマンドの実行
-		rc = i2c_msendRcv(i2c_cmd[1], &i2c_cmd[3], len-3, rcv, i2c_cmd[2]);
+		rc = i2c_msendRcv(i2c_cmd[1]<<I2C_ADR_SHIFT, &i2c_cmd[3], len-3, rcv, i2c_cmd[2]);
 		flgexec = true;
 	} else if (i2c_cmd[0] == 'c') {
 		// 1バイト単位送信コマンドの実行
 		for (i=3; i <len; i++) {
-			rc = i2c_send(i2c_cmd[1], i2c_cmd[2] , i2c_cmd[i]);
+			rc = i2c_send(i2c_cmd[1]<<I2C_ADR_SHIFT, i2c_cmd[2] , i2c_cmd[i]);
 			if (rc) break;
 			if (cmdwait>0)
 				delay(cmdwait);
@@ -168,10 +226,13 @@ int execI2Ccmd(uint8_t* i2c_cmd, int len,uint8_t* rcv) {
 		flgexec = true;
 	} else if (i2c_cmd[0] == 'g') {
 		// 受信コマンドの実行
-		rc = i2c_mreceive(i2c_cmd[1], rcv, i2c_cmd[2]);
+		rc = i2c_mreceive(i2c_cmd[1]<<I2C_ADR_SHIFT, rcv, i2c_cmd[2]);
+		flgexec = true;
+	} else if (i2c_cmd[0] == 'd') {
+		// ダミーコマンドの実行
+		rc = 0;
 		flgexec = true;
 	}
-
 	if (flgexec) {
 		if (flginf) {
 			// 実行結果の出力
@@ -269,25 +330,49 @@ int text2cmd(uint8_t* i2c_cmd, char *text) {
 			text++;
 			continue;
 		}
+		if ( *text=='n') { //NewLine(改行)指定
+			text++;
+			if (*text == '0') {
+				uart_setNewLine(0);
+			} else if (*text == '1') {
+				uart_setNewLine(1);
+			} else { // パラメタエラー
+				return CMD_ERR_CMDPRM;
+			}
+			text++;
+			continue;
+		}
 		if ( *text=='v') {
 			for_ichigo_rem();
 			uart_println(MYVERSION);
 			text++;
 			continue;
 		}
+		if ( *text=='x') {	// I2Cスレーブ調査
+			text++;
+			if (*text == '0') {
+				i2cdetect(0);
+			} else if (*text == '1') {
+				i2cdetect(1);
+			} else { // パラメタエラー
+				return CMD_ERR_CMDPRM;
+			}
+			text++;
+			continue;
+		}
 		if ( *text=='t') { //ディレイ設定
-			val = hex2val(++text); // アドレス取得
+			val = hex2val(++text); // 引数（時間）取得
 			if ( val < 0 ) {
-				return CMD_ERR_BADCMD; // 変換エラー
+				return CMD_ERR_CMDPRM; // 変換エラー
 			}
 			cmdwait = val;
 			text+=2;
 			continue;
 		}
 		if ( *text=='T') { //即時ディレイ実行
-			val = hex2val(++text); // アドレス取得
+			val = hex2val(++text); // 引数（時間）取得
 			if ( val < 0 ) {
-				return CMD_ERR_BADCMD; // 変換エラー
+				return CMD_ERR_CMDPRM; // 変換エラー
 			}
 			delay(val);
 			text+=2;
@@ -299,6 +384,18 @@ int text2cmd(uint8_t* i2c_cmd, char *text) {
 				flgichigo = false;
 			} else if (*text == '1') {
 				flgichigo = true;
+			} else { // パラメタエラー
+				return CMD_ERR_CMDPRM;
+			}
+			text++;
+			continue;
+		}
+		if ( *text=='l') { //ローカルエコー設定
+			text++;
+			if (*text == '0') {
+				modeECHO = 0;
+			} else if (*text == '1') {
+				modeECHO = 1;
 			} else { // パラメタエラー
 				return CMD_ERR_CMDPRM;
 			}
@@ -356,7 +453,12 @@ int text2cmd(uint8_t* i2c_cmd, char *text) {
 				}
 				i2c_cmd[i++]= (uint8_t)val;
 				text+=2;
-				flgcmd=true;
+				flgcmd = true;
+				flgdata = true;
+			} else if ( *text=='d' ) { //ダミーコマンド
+				i2c_cmd[i++]='d';
+				text++;
+				flgcmd = true;
 				flgdata = true;
 			} else {
 				return CMD_ERR_KNWCMD; // コマンド指定エラー
@@ -399,10 +501,6 @@ int text2cmd(uint8_t* i2c_cmd, char *text) {
 	}
 	if (!flgdata) {
 		return CMD_ERR_NODATA; // データ指定エラー
-	} else {
-		if (i == 1) {
-			return CMD_ERR_NODATA; // データ指定エラー
-		}
 	}
 	return i; // コマンドデータ長を返す
 }
@@ -422,7 +520,7 @@ int doUART2I2C() {
 	cmdwait  = 0;			// 1バイト単位送信時のウエイト時間msec
 
 	// シリアルポートからデータの取得
-	n = uart_readline(text,128,0);
+	n = uart_readline(text,128,0, modeECHO);
 	if (n>0) {
 		// テキストの解析
 		len = text2cmd(i2c_cmd,text);
@@ -459,6 +557,8 @@ int main(void) {
 	modeOut  = 0;			// 16進数HEXテキスト
 	flgdebug = false;		// デバッグ情報出力フラグ
 	flgichigo = false;		// IchigoJam用REM(')付加フラグ
+	uart_setNewLine(0);		// 改行形式（CR+LF)
+	modeECHO = 0;			// ローカルエコーなし
 
 	while(1) {
 		doUART2I2C();

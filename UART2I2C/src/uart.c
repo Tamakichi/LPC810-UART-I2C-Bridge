@@ -3,13 +3,15 @@
  *
  *  Created on: 2015/04/06
  *      Author: たま吉さん
+ *  Modifed on: 2016/07/18, uart_setNewLine() 改行コード設定 追加
  */
 
 #include "LPC8xx.h"
 #include "uart.h"
 #include "mrt.h"
 
-uint8_t uart_prevBuffover; // 直前の１行読み込みでバッファーオーバーがあったかの状態
+uint8_t uart_prevBuffover; 			// 直前の１行読み込みでバッファーオーバーがあったかの状態
+static uint8_t _modeNewLine = 0; 	// 送信改行モード(0:CR+LF 1:LFのみ)
 
 // UARTクロック供給設定
 void uart_clockinit( LPC_USART_TypeDef *UARTx ) {
@@ -63,16 +65,19 @@ inline char uart_read(void){
 // s    : 読み込み文字列格納先
 // len  : 最大読み込み文字列長
 // tmout: タイムアウト(msec： 0の場合、タイムアウトなし)
+// echo : 0 ローカルエコーなし 1:ローカルエコーあり
 // (補足) タイマーを使ってタイムアウト処理を行っている
 //       直前の1行読み込み時にバッファーオーバー発生の場合、受信済み1バイトを廃棄する
 //
-int uart_readline(char *s , uint16_t len, uint32_t tmout) {
+int uart_readline(char *s , uint16_t len, uint32_t tmout, uint8_t echo) {
 	int n = 0;
 	uint32_t cnt = mrt_read_counter();
 	uart_clear();
 	while(1) {
 		if ( uart_available() ) {
 			*s = uart_read();
+			if (echo)	// ローカルエコー
+				uart_write(*s);
 			if ( *s == 0x0d )
 				continue;
 			if ( *s == 0x0a )
@@ -113,7 +118,8 @@ void uart_print(const char *s) {
 
 // 改行出力
 void uart_writeln(void) {
-	uart_write (0x0d);
+	if (!_modeNewLine)
+		uart_write (0x0d);
 	uart_write (0x0a);
 	return;
 }
@@ -146,3 +152,8 @@ void uart_print_hex(uint8_t d) {
 	uart_write(v>9 ? v-10+'A': v+'0');
 }
 
+//  改行モードの設定
+//  引数:mode
+void uart_setNewLine(uint8_t mode) {
+
+}
