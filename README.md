@@ -76,7 +76,7 @@ http://www.nxp-lpc.com/programming_note/note3.html
 <img src="img/sample01.jpg" width="300">  
 送信コマンド  
     @c3c00@h01020c0180  
-    @c3c840@sThank you! 
+    @c3c40@sThank you! 
 
 - 液晶キャラクタディスプレイモジュール(ACM1602N1-FLW-FBW)  
 <img src="img/sample04.jpg" width="300">  
