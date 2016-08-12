@@ -401,13 +401,13 @@ OUTPUT(UART2I2C.axf elf32-littlearm)
  .debug_ranges  0x00000140       0xa0 ./src/uart.o
  .debug_ranges  0x000001e0       0x18 E:\LPCXpresso\workspace\CMSIS_CORE_LPC8xx\Release\libCMSIS_CORE_LPC8xx.a(system_LPC8xx.o)
 
-.debug_line     0x00000000      0xab5
+.debug_line     0x00000000      0xab7
  .debug_line    0x00000000      0x347 ./src/UART2I2C.o
  .debug_line    0x00000347       0xae ./src/cr_startup_lpc8xx.o
- .debug_line    0x000003f5      0x214 ./src/i2c.o
- .debug_line    0x00000609      0x13f ./src/mrt.o
- .debug_line    0x00000748      0x268 ./src/uart.o
- .debug_line    0x000009b0      0x105 E:\LPCXpresso\workspace\CMSIS_CORE_LPC8xx\Release\libCMSIS_CORE_LPC8xx.a(system_LPC8xx.o)
+ .debug_line    0x000003f5      0x216 ./src/i2c.o
+ .debug_line    0x0000060b      0x13f ./src/mrt.o
+ .debug_line    0x0000074a      0x268 ./src/uart.o
+ .debug_line    0x000009b2      0x105 E:\LPCXpresso\workspace\CMSIS_CORE_LPC8xx\Release\libCMSIS_CORE_LPC8xx.a(system_LPC8xx.o)
 
 .debug_str      0x00000000      0xc85
  .debug_str     0x00000000      0x5f6 ./src/UART2I2C.o
