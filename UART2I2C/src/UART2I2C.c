@@ -2,7 +2,7 @@
 ===============================================================================
  Name        : UART2I2C.c
  Author      : Tamakichi
- Version     : 2.00
+ Version     : 2.02 2016/09/05
  Copyright   : $(copyright)
  Description : main definition
 ===============================================================================
@@ -18,7 +18,7 @@
 #include "mrt.h"
 #include "i2c.h"
 
-#define MYVERSION			"[v2.00 2016/07/19 by Tamakichi]"
+#define MYVERSION			"[v2.02 2016/09/05 by Tamakichi]"
 #define CMD_ERR_BADCMD		-10 // コマンドエラー
 #define CMD_ERR_STRHEX		-11 // 16進数文字異常
 #define CMD_ERR_CMDPRM		-12 // パラメタエラー
@@ -147,6 +147,7 @@ void debug_uartToi2c(int n, uint8_t* i2c_cmd,char *text) {
 
 //
 // I2Cバスに接続しているスレーブのアドレス（7ビット）を表示する
+// 引数:mode 0:HEX ,1:dump
 //
 void i2cdetect(uint8_t mode) {
 	uint8_t i;
@@ -156,7 +157,7 @@ void i2cdetect(uint8_t mode) {
 	// タイムアウト時間を一時的に100msecに変更
 	i2c_setTimeOut(100);
 
-	// 上ヘッダーの出力
+	// 上ヘッダーの出力(ダンプ表示指定時)
 	if (mode) {
 		for_ichigo_rem();
 		uart_print("   ");
@@ -176,20 +177,30 @@ void i2cdetect(uint8_t mode) {
 		}
 		if (i < 0x08 || i > 0x77 ) {
 			if (mode)
-				uart_print("  ");
+				uart_print("   ");
 		} else {
-			rc = i2c_msend(i<<I2C_ADR_SHIFT, &dummy, 0);
+			rc = i2c_msend((i<<I2C_ADR_SHIFT), &dummy, 0);
 			if (!rc) {
 				uart_print_hex(i);
-			} else {
 				if (mode)
-					uart_print("--");
+					uart_print(" ");
+			} else {
+				rc = i2c_msend((i<<I2C_ADR_SHIFT)|1, &dummy, 0);
+				if (!rc) {
+					uart_print_hex(i);
+					if (mode)
+						uart_print("*");
+				} else {
+					if (mode)
+						uart_print("-- ");
+				}
 			}
 		}
+/*
 		if (mode)
 			uart_print(" ");
-
-		if ( ((i & 0x0f) == 0x0f) && mode) {
+*/
+		if ( ((i & 0x0f) == 0x0f) && (mode)) {
 			uart_writeln(); // 1行改行
 		}
 	}

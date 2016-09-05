@@ -18,7 +18,7 @@ extern "C"
 {
 #endif
 
-#define LPC810				1
+//#define LPC810				1
 #define RD_BIT              0x01
 
 #define I2C_FMODE_PLUS_PRE_DIV	(9-1)		/* 1MHz */
